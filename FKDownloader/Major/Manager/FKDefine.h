@@ -86,6 +86,12 @@ extern FKResumeDataKey const FKResumeDataInfoVersion;
 extern FKResumeDataKey const FKResumeDataOriginalRequest;
 extern FKResumeDataKey const FKResumeDataServerDownloadDate;
 
+typedef NS_ENUM(NSInteger, FKTaskType) {
+    FKTaskTypeSingle,
+    FKTaskTypeGroup,
+    FKTaskTypeDrip
+};
+
 // TODO: 可添加连接服务器中的状态, 以填补网络环境太差的空缺
 typedef NS_ENUM(NSInteger, TaskStatus) {
     TaskStatusNone = 0,     // 无状态, 仅表示已加入队列

@@ -476,7 +476,7 @@ static FKDownloadManager *_instance = nil;
 
 - (void)startWithAll {
     self.isControlTasks = YES;
-    [self.taskHub.allTask forEach:^(FKTask *task, NSUInteger idx) {
+    [self.taskHub.allTask orderEach:^(FKTask *task, NSUInteger idx) {
         [self start:task.url];
     }];
     self.isControlTasks = NO;

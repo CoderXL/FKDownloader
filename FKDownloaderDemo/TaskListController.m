@@ -17,6 +17,7 @@
 @property (nonatomic, strong) UITableView *listView;
 
 @property (nonatomic, strong) dispatch_source_t groupTimer;
+@property (nonatomic, assign) NSInteger finishCount;
 
 @end
 
@@ -27,7 +28,7 @@
     // Do any additional setup after loading the view.
     
     self.view.backgroundColor = [UIColor whiteColor];
-    
+    self.finishCount = 0;
     NSMutableArray *tasks = [NSMutableArray arrayWithCapacity:self.urls.count];
     [self.urls forEach:^(NSString *url, NSUInteger idx) {
         if (idx == 0) {
@@ -93,10 +94,17 @@
      */
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishTask) name:FKTaskDidFinishNotification object:nil];
+}
+
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
     dispatch_source_cancel(self.groupTimer);
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:FKTaskDidFinishNotification object:nil];
 }
 
 - (void)viewWillLayoutSubviews {
@@ -136,6 +144,14 @@
     [[[FKDownloadManager manager] acquireWithTag:@"group_task_02"] groupProgress:^(double progress) {
         FKLog(@"group_task_02 progress: %.6f", progress);
     }];
+}
+
+- (void)didFinishTask {
+    self.finishCount++;
+    if (self.finishCount == self.urls.count) {
+        // Remove
+        [[FKDownloadManager manager] removeWithAll];
+    }
 }
 
 #pragma mark - UITableViewDataSource, UITableViewDelegate>
@@ -179,14 +195,14 @@
 - (NSArray<NSString *> *)urls {
     if (!_urls) {
         // 可以将测试数量增大, 如 500, 1000, 5000...
-        NSUInteger count = 5;
+        NSUInteger count = 1;
         NSMutableArray *urls = [NSMutableArray arrayWithCapacity:count];
         
         [urls addObjectsFromArray:@[@"http://m4.pc6.com/cjh3/deliver259.dmg",
                                     @"http://m4.pc6.com/cjh3/LogMeInInstaller7009.zip",
                                     @"http://m4.pc6.com/cjh3/VicomsoftFTPClient.dmg",
                                     @"http://m5.pc6.com/xuh5/hype363.zip",
-                                    @"http://dl1sw.baidu.com/client/20150922/Xcode_7.1_beta.dmg"]];
+                                    /*@"http://dl1sw.baidu.com/client/20150922/Xcode_7.1_beta.dmg"*/]];
         
         for (int i = 0; i < count; i ++) {
             [urls addObject:[NSString stringWithFormat:@"http://m4.pc6.com/cjh3/Remotix.dmg?p=%d", i]];
