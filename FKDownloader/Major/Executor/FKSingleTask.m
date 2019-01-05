@@ -61,9 +61,28 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
 - (instancetype)init {
     self = [super init];
     if (self) {
+        self.manager = [FKDownloadManager manager];
         self.type = FKTaskTypeSingle;
+        self.number = [self.manager readAutonumber] + 1;
+        [self.manager autonumberOfInc:1];
     }
     return self;
+}
+
+- (instancetype)initWithLink:(NSString *)link {
+    self = [super init];
+    if (self) {
+        self.manager = [FKDownloadManager manager];
+        self.link = link;
+        self.type = FKTaskTypeSingle;
+        self.number = [self.manager readAutonumber] + 1;
+        [self.manager autonumberOfInc:1];
+    }
+    return self;
+}
+
++ (instancetype)taskWithLink:(NSString *)link {
+    return [[self alloc] initWithLink:link];
 }
 
 - (void)start {
@@ -77,7 +96,7 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
     [self.downloadTask addObserver:self forKeyPath:NSStringFromSelector(@selector(countOfBytesExpectedToReceive)) options:NSKeyValueObservingOptionNew context:nil];
     [self.downloadTask addObserver:self forKeyPath:NSStringFromSelector(@selector(countOfBytesReceived)) options:NSKeyValueObservingOptionNew context:nil];
     if (self.status) {
-        self.status();
+        self.status(self);
     }
 }
 
@@ -90,7 +109,7 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
         }
     }];
     if (self.status) {
-        self.status();
+        self.status(self);
     }
 }
 
@@ -100,14 +119,14 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
     [self.downloadTask addObserver:self forKeyPath:NSStringFromSelector(@selector(countOfBytesExpectedToReceive)) options:NSKeyValueObservingOptionNew context:nil];
     [self.downloadTask addObserver:self forKeyPath:NSStringFromSelector(@selector(countOfBytesReceived)) options:NSKeyValueObservingOptionNew context:nil];
     if (self.status) {
-        self.status();
+        self.status(self);
     }
 }
 
 - (void)cancel {
     [self.downloadTask cancel];
     if (self.status) {
-        self.status();
+        self.status(self);
     }
 }
 
@@ -140,32 +159,55 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
         // progress
         self.taskProgress.completedUnitCount = self.downloadTask.countOfBytesReceived;
         if (self.progress) {
-            self.progress();
+            self.progress(self);
         }
     }
 }
 
-- (void)obWithSt:(FKStatusBlock)st
-            prog:(FKProgressBlock)prog
-         success:(FKSuccessBlock)success
-           faild:(FKFaildBlock)faild {
-    
-    self.status = st;
-    self.progress = prog;
-    self.success = success;
-    self.faild = faild;
+- (FKSingleTask *)status:(void(^)(FKSingleTask *task))status {
+    self.status = status;
+    return self;
 }
+
+- (FKSingleTask *)progress:(void(^)(FKSingleTask *task))progress {
+    self.progress = progress;
+    return self;
+}
+
+- (FKSingleTask *)success:(void(^)(FKSingleTask *task))success {
+    self.success = success;
+    return self;
+}
+
+- (FKSingleTask *)faild:(void(^)(FKSingleTask *task))faild {
+    self.faild = faild;
+    return self;
+}
+
 
 #pragma mark - Getter/setter
 - (void)setLink:(NSString *)link {
     _link = link;
     
     self.identifier = [link SHA256];
+    
     NSString *rootPath = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).lastObject;
     NSString *taskDir = [rootPath stringByAppendingPathComponent:self.identifier];
     if ([self.manager.fileManager fileExistsAtPath:taskDir] == NO) {
         [self.manager.fileManager createDirectoryAtPath:taskDir withIntermediateDirectories:YES attributes:nil error:nil];
         self.taskDir = taskDir;
+    }
+    
+    NSString *dtiPath = [taskDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dti", self.identifier]];
+    if ([self.manager.fileManager fileExistsAtPath:dtiPath]) {
+        FKSingleTaskInfo info;
+        FILE *fp = fopen(dtiPath.UTF8String, "rd");
+        fread(&info, sizeof(FKSingleTaskInfo), 1, fp);
+        fclose(fp);
+        
+        self.number = info.base.number;
+        self.length = info.length;
+        self.tmp = [NSString stringWithUTF8String:info.tmp];
     }
 }
 

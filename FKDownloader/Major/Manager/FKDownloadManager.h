@@ -198,6 +198,10 @@ NS_SWIFT_NAME(Downloader)
  */
 - (NSArray<FKTask *> *)filterTaskWithStatus:(NSUInteger)status;
 
+#pragma mark - Autonumber
+- (uint64_t)readAutonumber;
+- (void)autonumberOfInc:(uint64_t)number;
+
 #pragma mark - Disable Method
 - (instancetype)init                                    OBJC_DEPRECATED("use +[FKDownloadManager manager];");
 - (void)dealloc                                         UNAVAILABLE_ATTRIBUTE;

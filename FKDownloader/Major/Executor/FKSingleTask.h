@@ -10,10 +10,10 @@
 #import "FKTaskProtocol.h"
 @class FKDownloadManager;
 
-typedef void(^FKStatusBlock)(void);
-typedef void(^FKProgressBlock)(void);
-typedef void(^FKSuccessBlock)(void);
-typedef void(^FKFaildBlock)(void);
+typedef void(^FKStatusBlock)(id<FKTaskProtocol> task);
+typedef void(^FKProgressBlock)(id<FKTaskProtocol> task);
+typedef void(^FKSuccessBlock)(id<FKTaskProtocol> task);
+typedef void(^FKFaildBlock)(id<FKTaskProtocol> task);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -30,10 +30,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy  ) FKSuccessBlock success;
 @property (nonatomic, copy  ) FKFaildBlock faild;
 
-- (void)obWithSt:(FKStatusBlock)st
-            prog:(FKProgressBlock)prog
-         success:(FKSuccessBlock)success
-           faild:(FKFaildBlock)faild;
+- (instancetype)initWithLink:(NSString *)link;
++ (instancetype)taskWithLink:(NSString *)link;
+
+- (FKSingleTask *)status:(void(^)(FKSingleTask *task))status;
+- (FKSingleTask *)progress:(void(^)(FKSingleTask *task))progress;
+- (FKSingleTask *)success:(void(^)(FKSingleTask *task))success;
+- (FKSingleTask *)faild:(void(^)(FKSingleTask *task))faild;
 
 - (void)start;
 - (void)suspend;
