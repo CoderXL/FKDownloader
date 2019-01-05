@@ -24,6 +24,7 @@
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
+    /*
     if (task.currentRequest.URL.absoluteString.length == 0) {
         return;
     }
@@ -72,12 +73,14 @@
     }
     
     [[FKDownloadManager manager] startNextIdleTask];
+     */
 }
 
 
 #pragma mark - NSURLSessionDownloadDelegate
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
     
+    /*
     [[FKDownloadManager manager] setupPath];
     FKTask *task = [[FKDownloadManager manager] acquire:downloadTask.currentRequest.URL.absoluteString];
     if (task == nil) {
@@ -124,12 +127,15 @@
                                                     NSLocalizedDescriptionKey: @"The operation couldn’t be completed. No such file or directory"}];
         [task sendErrorInfo:error];
     }
+     */
 }
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didResumeAtOffset:(int64_t)fileOffset expectedTotalBytes:(int64_t)expectedTotalBytes {
     
+    /*
     FKTask *task = [[FKDownloadManager manager] acquire:downloadTask.currentRequest.URL.absoluteString];
     task.progress.completedUnitCount = fileOffset;
+     */
 }
 
 @end

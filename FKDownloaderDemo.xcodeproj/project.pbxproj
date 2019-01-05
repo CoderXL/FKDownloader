@@ -69,6 +69,8 @@
 		3DD308D0218BEE3300BDF330 /* FKTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DD308CD218BEE3300BDF330 /* FKTask.m */; };
 		3DD308D3218C403C00BDF330 /* FKDownloadExecutor.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DD308D2218C403C00BDF330 /* FKDownloadExecutor.m */; };
 		3DD308F8218C4E8D00BDF330 /* NSString+FKDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DD308F7218C4E8D00BDF330 /* NSString+FKDownload.m */; };
+		3DDE858921E09EF6007EF91C /* FKSingleTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D24731E21DD8D1F00AEBA7D /* FKSingleTask.m */; };
+		3DDE858A21E09F0C007EF91C /* FKStorageHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D24732421DDE1DF00AEBA7D /* FKStorageHelper.m */; };
 		3DF3534221DC5E09000D57F8 /* FKTaskProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DF3534121DC5E09000D57F8 /* FKTaskProtocol.h */; };
 		642481A06E5DA04399718DF8 /* FKHubProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 64248AC7FAC8B469C91769E6 /* FKHubProtocol.h */; };
 /* End PBXBuildFile section */
@@ -471,6 +473,8 @@
 				3DA41D0621A2AAEC00B48D03 /* NSData+FKDownload.m in Sources */,
 				3DA41CDA21A1AB5000B48D03 /* FKHashHelper.m in Sources */,
 				3DC0789D21A686E30066CB2C /* FKDefine.m in Sources */,
+				3DDE858A21E09F0C007EF91C /* FKStorageHelper.m in Sources */,
+				3DDE858921E09EF6007EF91C /* FKSingleTask.m in Sources */,
 				3DD308CF218BEE3300BDF330 /* FKDownloadManager.m in Sources */,
 				3DD308F8218C4E8D00BDF330 /* NSString+FKDownload.m in Sources */,
 				3DD308D3218C403C00BDF330 /* FKDownloadExecutor.m in Sources */,

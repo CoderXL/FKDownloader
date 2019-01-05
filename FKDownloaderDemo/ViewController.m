@@ -8,10 +8,12 @@
 
 #import "ViewController.h"
 #import "TaskListController.h"
+#import "FKDownloader.h"
 
 @interface ViewController ()
 
 @property (nonatomic, strong) UIButton *button;
+@property (nonatomic, strong) FKSingleTask *task;
 
 @end
 
@@ -26,6 +28,23 @@
     [self.button setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
     [self.button addTarget:self action:@selector(pushTaskList) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.button];
+}
+
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    self.task = [[FKSingleTask alloc] init];
+    self.task.manager = [FKDownloadManager manager];
+    self.task.link = @"http://m4.pc6.com/cjh3/deliver259.dmg";
+    self.task.number = 0;
+    [self.task obWithSt:^{
+        NSLog(@"状态改变");
+    } prog:^{
+        NSLog(@"进度改变");
+    } success:^{
+        
+    } faild:^{
+        
+    }];
+    [self.task start];
 }
 
 - (void)viewWillLayoutSubviews {

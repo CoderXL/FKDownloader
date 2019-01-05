@@ -96,6 +96,11 @@ typedef struct FKDripTaskInfo {
             info.base.type = singleTask.type;
             info.length = singleTask.length;
             info.tmp = strdup(singleTask.tmp.UTF8String);
+            /*
+            FILE *fp = fopen("path", "wd");
+            fwrite(&info, sizeof(info), 1, fp);
+            fclose(fp);
+             */
         } break;
             
         case FKTaskTypeGroup: {
