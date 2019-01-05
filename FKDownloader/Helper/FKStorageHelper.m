@@ -9,45 +9,6 @@
 #import "FKStorageHelper.h"
 #import "FKSingleTask.h"
 
-/**
- 任务 -> 文件
- - task.identifier
- |- task.identifier.dti
- |- task.tmp
- |- task.identifier.{idx}.trd
- |- task.identifier.file[s]
- 
- 任务信息
- - single
- number
- sha256(link)
- type
- length
- tmp
- 
- - group
- number
- sha256(name)
- type
- tasks[
-    link
-    length
-    tmp
- ]
- 
- - drip
- number
- sha256(link)
- type
- length
- drip[
-    idx
-    start
-    end
-    tmp
- ]
- */
-
 @implementation FKStorageHelper
 
 + (void)saveTask:(id<FKTaskProtocol>)task {
@@ -60,7 +21,7 @@
             info.base.type = singleTask.type;
             strcpy(info.base.identifier, [singleTask.identifier cStringUsingEncoding:NSUTF8StringEncoding]);
             strcpy(info.link, [singleTask.link cStringUsingEncoding:NSUTF8StringEncoding]);
-            info.length = singleTask.length;
+            info.base.length = singleTask.length;
             strcpy(info.tmp, [singleTask.tmp cStringUsingEncoding:NSUTF8StringEncoding]);
             
             NSString *dtiPath = [singleTask.taskDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dti", singleTask.identifier]];
