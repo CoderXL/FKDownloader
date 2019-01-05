@@ -7,7 +7,16 @@
 //
 
 #import "NSURLSessionDownloadTask+FKDownload.h"
+#import <objc/runtime.h>
 
 @implementation NSURLSessionDownloadTask (FKDownload)
+
+- (NSString *)fkidentifier {
+    return objc_getAssociatedObject(self, @selector(fkidentifier));
+}
+
+- (void)setFkidentifier:(NSString *)fkidentifier {
+    objc_setAssociatedObject(self, @selector(fkidentifier), fkidentifier, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
 
 @end

@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSURLSessionDownloadTask (FKDownload)
 
+@property (nonatomic, strong) NSString *fkidentifier;
+
 @end
 
 NS_ASSUME_NONNULL_END
