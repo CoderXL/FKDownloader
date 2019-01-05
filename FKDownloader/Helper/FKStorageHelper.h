@@ -9,6 +9,42 @@
 #import <Foundation/Foundation.h>
 #import "FKTaskProtocol.h"
 
+typedef struct FKTaskBaseInfo {
+    uint64_t number;
+    char identifier[65];
+    long type;
+} FKTaskBaseInfo;
+
+typedef struct FKGroupTaskComponent {
+    char link[4096];
+    uint64_t length;
+    char tmp[64];
+} FKGroupTaskComponent;
+
+typedef struct FKDripTaskComponent {
+    uint64_t idx;
+    uint16_t start;
+    uint16_t end;
+    char tmp[64];
+} FKDripTaskComponent;
+
+typedef struct FKSingleTaskInfo {
+    FKTaskBaseInfo base;
+    uint64_t length;
+    char link[4096];
+    char tmp[64];
+} FKSingleTaskInfo;
+
+typedef struct FKGroupTaskInfo {
+    FKTaskBaseInfo base;
+    FKGroupTaskComponent *components;
+} FKGroupTaskInfo;
+
+typedef struct FKDripTaskInfo {
+    FKTaskBaseInfo base;
+    FKDripTaskComponent *components;
+} FKDripTaskInfo;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface FKStorageHelper : NSObject

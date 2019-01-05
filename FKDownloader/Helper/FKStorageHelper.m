@@ -48,41 +48,6 @@
  ]
  */
 
-typedef struct FKTaskBaseInfo {
-    uint64_t number;
-    char *identifier;
-    long type;
-} FKTaskBaseInfo;
-
-typedef struct FKGroupTaskComponent {
-    char *link;
-    uint64_t length;
-    char *tmp;
-} FKGroupTaskComponent;
-
-typedef struct FKDripTaskComponent {
-    uint64_t idx;
-    uint16_t start;
-    uint16_t end;
-    char *tmp;
-} FKDripTaskComponent;
-
-typedef struct FKSingleTaskInfo {
-    FKTaskBaseInfo base;
-    uint64_t length;
-    char *tmp;
-} FKSingleTaskInfo;
-
-typedef struct FKGroupTaskInfo {
-    FKTaskBaseInfo base;
-    FKGroupTaskComponent *components;
-} FKGroupTaskInfo;
-
-typedef struct FKDripTaskInfo {
-    FKTaskBaseInfo base;
-    FKDripTaskComponent *components;
-} FKDripTaskInfo;
-
 @implementation FKStorageHelper
 
 + (void)saveTask:(id<FKTaskProtocol>)task {
@@ -92,14 +57,15 @@ typedef struct FKDripTaskInfo {
             
             FKSingleTaskInfo info;
             info.base.number = singleTask.number;
-            info.base.identifier = strdup(singleTask.identifier.UTF8String);
             info.base.type = singleTask.type;
+            strcpy(info.base.identifier, [singleTask.identifier cStringUsingEncoding:NSUTF8StringEncoding]);
+            strcpy(info.link, [singleTask.link cStringUsingEncoding:NSUTF8StringEncoding]);
             info.length = singleTask.length;
-            info.tmp = strdup(singleTask.tmp.UTF8String);
+            strcpy(info.tmp, [singleTask.tmp cStringUsingEncoding:NSUTF8StringEncoding]);
             
-            NSString *dtiPath = [singleTask.taskDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.tdi", singleTask.identifier]];
+            NSString *dtiPath = [singleTask.taskDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dti", singleTask.identifier]];
             FILE *fp = fopen(dtiPath.UTF8String, "wd");
-            fwrite(&info, sizeof(info), 1, fp);
+            fwrite(&info, sizeof(FKSingleTaskInfo), 1, fp);
             fclose(fp);
             
         } break;
