@@ -25,11 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSData *resumeData;
 @property (nonatomic, strong) NSString *taskDir;
 
-@property (nonatomic, copy  ) FKStatusBlock status;
-@property (nonatomic, copy  ) FKProgressBlock progress;
-@property (nonatomic, copy  ) FKSuccessBlock success;
-@property (nonatomic, copy  ) FKFaildBlock faild;
-
 - (instancetype)initWithLink:(NSString *)link;
 + (instancetype)taskWithLink:(NSString *)link;
 

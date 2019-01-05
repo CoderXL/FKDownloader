@@ -46,6 +46,11 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
 
 @interface FKSingleTask ()
 
+@property (nonatomic, copy  ) NSMutableSet *statusBlocks;
+@property (nonatomic, copy  ) NSMutableSet *progressBlocks;
+@property (nonatomic, copy  ) NSMutableSet *successBlocks;
+@property (nonatomic, copy  ) NSMutableSet *faildBlocks;
+
 @property (nonatomic, strong) NSURLSessionDownloadTask *downloadTask;
 @property (nonatomic, strong) NSProgress *taskProgress;
 @property (nonatomic, assign, getter=isTempFileNameSaved) BOOL tempFileNameSaved;
@@ -95,8 +100,8 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
     [self.downloadTask resume];
     [self.downloadTask addObserver:self forKeyPath:NSStringFromSelector(@selector(countOfBytesExpectedToReceive)) options:NSKeyValueObservingOptionNew context:nil];
     [self.downloadTask addObserver:self forKeyPath:NSStringFromSelector(@selector(countOfBytesReceived)) options:NSKeyValueObservingOptionNew context:nil];
-    if (self.status) {
-        self.status(self);
+    for (void(^block)(id<FKTaskProtocol>) in self.statusBlocks) {
+        block(self);
     }
 }
 
@@ -108,8 +113,8 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
             [self.downloadTask removeObserver:self forKeyPath:NSStringFromSelector(@selector(countOfBytesExpectedToReceive)) context:nil];
         }
     }];
-    if (self.status) {
-        self.status(self);
+    for (void(^block)(id<FKTaskProtocol>) in self.statusBlocks) {
+        block(self);
     }
 }
 
@@ -118,15 +123,15 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
     [self.downloadTask resume];
     [self.downloadTask addObserver:self forKeyPath:NSStringFromSelector(@selector(countOfBytesExpectedToReceive)) options:NSKeyValueObservingOptionNew context:nil];
     [self.downloadTask addObserver:self forKeyPath:NSStringFromSelector(@selector(countOfBytesReceived)) options:NSKeyValueObservingOptionNew context:nil];
-    if (self.status) {
-        self.status(self);
+    for (void(^block)(id<FKTaskProtocol>) in self.statusBlocks) {
+        block(self);
     }
 }
 
 - (void)cancel {
     [self.downloadTask cancel];
-    if (self.status) {
-        self.status(self);
+    for (void(^block)(id<FKTaskProtocol>) in self.statusBlocks) {
+        block(self);
     }
 }
 
@@ -158,29 +163,29 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
     if ([keyPath isEqualToString:NSStringFromSelector(@selector(countOfBytesReceived))]) {
         // progress
         self.taskProgress.completedUnitCount = self.downloadTask.countOfBytesReceived;
-        if (self.progress) {
-            self.progress(self);
+        for (void(^block)(id<FKTaskProtocol>) in self.progressBlocks) {
+            block(self);
         }
     }
 }
 
 - (FKSingleTask *)status:(void(^)(FKSingleTask *task))status {
-    self.status = status;
+    [self.statusBlocks addObject:status];
     return self;
 }
 
 - (FKSingleTask *)progress:(void(^)(FKSingleTask *task))progress {
-    self.progress = progress;
+    [self.progressBlocks addObject:progress];
     return self;
 }
 
 - (FKSingleTask *)success:(void(^)(FKSingleTask *task))success {
-    self.success = success;
+    [self.successBlocks addObject:success];
     return self;
 }
 
 - (FKSingleTask *)faild:(void(^)(FKSingleTask *task))faild {
-    self.faild = faild;
+    [self.faildBlocks addObject:faild];
     return self;
 }
 
@@ -195,13 +200,13 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
     NSString *taskDir = [rootPath stringByAppendingPathComponent:self.identifier];
     if ([self.manager.fileManager fileExistsAtPath:taskDir] == NO) {
         [self.manager.fileManager createDirectoryAtPath:taskDir withIntermediateDirectories:YES attributes:nil error:nil];
-        self.taskDir = taskDir;
     }
+    self.taskDir = taskDir;
     
     NSString *dtiPath = [taskDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dti", self.identifier]];
     if ([self.manager.fileManager fileExistsAtPath:dtiPath]) {
         FKSingleTaskInfo info;
-        FILE *fp = fopen(dtiPath.UTF8String, "rd");
+        FILE *fp = fopen(dtiPath.UTF8String, "rb");
         fread(&info, sizeof(FKSingleTaskInfo), 1, fp);
         fclose(fp);
         
@@ -216,6 +221,34 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
         _taskProgress = [NSProgress progressWithTotalUnitCount:1];
     }
     return _taskProgress;
+}
+
+- (NSMutableSet *)statusBlocks {
+    if (!_statusBlocks) {
+        _statusBlocks = [NSMutableSet set];
+    }
+    return _statusBlocks;
+}
+
+- (NSMutableSet *)progressBlocks {
+    if (!_progressBlocks) {
+        _progressBlocks = [NSMutableSet set];
+    }
+    return _progressBlocks;
+}
+
+- (NSMutableSet *)successBlocks {
+    if (!_successBlocks) {
+        _successBlocks = [NSMutableSet set];
+    }
+    return _successBlocks;
+}
+
+- (NSMutableSet *)faildBlocks {
+    if (!_faildBlocks) {
+        _faildBlocks = [NSMutableSet set];
+    }
+    return _faildBlocks;
 }
 
 @end

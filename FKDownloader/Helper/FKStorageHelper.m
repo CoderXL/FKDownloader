@@ -64,7 +64,7 @@
             strcpy(info.tmp, [singleTask.tmp cStringUsingEncoding:NSUTF8StringEncoding]);
             
             NSString *dtiPath = [singleTask.taskDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dti", singleTask.identifier]];
-            FILE *fp = fopen(dtiPath.UTF8String, "wd");
+            FILE *fp = fopen(dtiPath.UTF8String, "wb");
             fwrite(&info, sizeof(FKSingleTaskInfo), 1, fp);
             fclose(fp);
             
