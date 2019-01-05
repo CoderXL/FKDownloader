@@ -31,8 +31,7 @@
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    self.task = [FKSingleTask taskWithLink:@"http://m4.pc6.com/cjh3/deliver259.dmg"];
-    [[[[self.task status:^(FKSingleTask * _Nonnull task) {
+    self.task = [[[[[[FKSingleTask taskWithLink:@"http://m4.pc6.com/cjh3/deliver259.dmg"] status:^(FKSingleTask * _Nonnull task) {
         NSLog(@"状态改变");
     }] progress:^(FKSingleTask * _Nonnull task) {
         NSLog(@"进度改变");
@@ -40,8 +39,7 @@
         NSLog(@"完成");
     }] faild:^(FKSingleTask * _Nonnull task) {
         NSLog(@"失败");
-    }];
-    [self.task start];
+    }] start];
 }
 
 - (void)viewWillLayoutSubviews {

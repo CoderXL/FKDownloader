@@ -33,10 +33,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (FKSingleTask *)success:(void(^)(FKSingleTask *task))success;
 - (FKSingleTask *)faild:(void(^)(FKSingleTask *task))faild;
 
-- (void)start;
-- (void)suspend;
-- (void)resume;
-- (void)cancel;
+- (FKSingleTask *)start;
+- (FKSingleTask *)suspend;
+- (FKSingleTask *)resume;
+- (FKSingleTask *)cancel;
 
 @end
 

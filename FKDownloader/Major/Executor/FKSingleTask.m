@@ -46,10 +46,10 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
 
 @interface FKSingleTask ()
 
-@property (nonatomic, copy  ) NSMutableSet *statusBlocks;
-@property (nonatomic, copy  ) NSMutableSet *progressBlocks;
-@property (nonatomic, copy  ) NSMutableSet *successBlocks;
-@property (nonatomic, copy  ) NSMutableSet *faildBlocks;
+@property (nonatomic, copy  ) NSMutableSet<void(^)(FKSingleTask *)> *statusBlocks;
+@property (nonatomic, copy  ) NSMutableSet<void(^)(FKSingleTask *)> *progressBlocks;
+@property (nonatomic, copy  ) NSMutableSet<void(^)(FKSingleTask *)> *successBlocks;
+@property (nonatomic, copy  ) NSMutableSet<void(^)(FKSingleTask *)> *faildBlocks;
 
 @property (nonatomic, strong) NSURLSessionDownloadTask *downloadTask;
 @property (nonatomic, strong) NSProgress *taskProgress;
@@ -90,7 +90,7 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
     return [[self alloc] initWithLink:link];
 }
 
-- (void)start {
+- (FKSingleTask *)start {
     // 创建 task
     // 获取 tmp 文件名
     // 获取 length
@@ -103,9 +103,10 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
     for (void(^block)(id<FKTaskProtocol>) in self.statusBlocks) {
         block(self);
     }
+    return self;
 }
 
-- (void)suspend {
+- (FKSingleTask *)suspend {
     [self.downloadTask cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
         if (resumeData) {
             self.resumeData = resumeData;
@@ -116,9 +117,10 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
     for (void(^block)(id<FKTaskProtocol>) in self.statusBlocks) {
         block(self);
     }
+    return self;
 }
 
-- (void)resume {
+- (FKSingleTask *)resume {
     self.downloadTask = [self.manager.session downloadTaskWithResumeData:self.resumeData];
     [self.downloadTask resume];
     [self.downloadTask addObserver:self forKeyPath:NSStringFromSelector(@selector(countOfBytesExpectedToReceive)) options:NSKeyValueObservingOptionNew context:nil];
@@ -126,13 +128,15 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
     for (void(^block)(id<FKTaskProtocol>) in self.statusBlocks) {
         block(self);
     }
+    return self;
 }
 
-- (void)cancel {
+- (FKSingleTask *)cancel {
     [self.downloadTask cancel];
     for (void(^block)(id<FKTaskProtocol>) in self.statusBlocks) {
         block(self);
     }
+    return self;
 }
 
 #pragma mark - Observer
@@ -211,7 +215,7 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
         fclose(fp);
         
         self.number = info.base.number;
-        self.length = info.length;
+        self.length = info.base.length;
         self.tmp = [NSString stringWithUTF8String:info.tmp];
     }
 }
