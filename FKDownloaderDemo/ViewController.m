@@ -31,18 +31,15 @@
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    self.task = [[FKSingleTask alloc] init];
-    self.task.manager = [FKDownloadManager manager];
-    self.task.link = @"http://m4.pc6.com/cjh3/deliver259.dmg";
-    self.task.number = 0;
-    [self.task obWithSt:^{
+    self.task = [FKSingleTask taskWithLink:@"http://m4.pc6.com/cjh3/deliver259.dmg"];
+    [[[[self.task status:^(FKSingleTask * _Nonnull task) {
         NSLog(@"状态改变");
-    } prog:^{
+    }] progress:^(FKSingleTask * _Nonnull task) {
         NSLog(@"进度改变");
-    } success:^{
-        
-    } faild:^{
-        
+    }] success:^(FKSingleTask * _Nonnull task) {
+        NSLog(@"完成");
+    }] faild:^(FKSingleTask * _Nonnull task) {
+        NSLog(@"失败");
     }];
     [self.task start];
 }
@@ -59,8 +56,10 @@
 }
 
 - (void)pushTaskList {
+    /*
     TaskListController *listController = [[TaskListController alloc] init];
     [self.navigationController pushViewController:listController animated:YES];
+     */
 }
 
 @end
