@@ -23,10 +23,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) uint64_t length;
 @property (nonatomic, strong) NSString *tmp;
 @property (nonatomic, strong) NSData *resumeData;
-@property (nonatomic, strong) NSString *taskDir;
+@property (nonatomic, strong) NSString *ext;
 
 - (instancetype)initWithLink:(NSString *)link;
 + (instancetype)taskWithLink:(NSString *)link;
+
+- (NSString *)link;
 
 - (FKSingleTask *)status:(void(^)(FKSingleTask *task))status;
 - (FKSingleTask *)progress:(void(^)(FKSingleTask *task))progress;

@@ -109,6 +109,17 @@ static FKDownloadManager *_instance = nil;
     BOOL isDirectory = NO;
     BOOL isFileExist = NO;
     
+    if (self.configure.rootPath.length) {
+        isDirectory = NO;
+        isFileExist = [self.fileManager fileExistsAtPath:self.configure.rootPath isDirectory:&isDirectory];
+        if (!(isFileExist && isDirectory)) {
+            [self.fileManager createDirectoryAtPath:self.configure.rootPath
+                        withIntermediateDirectories:YES
+                                         attributes:nil
+                                              error:nil];
+        }
+    }
+    
     if (self.configure.savePath.length) {
         isDirectory = NO;
         isFileExist = [self.fileManager fileExistsAtPath:self.configure.savePath isDirectory:&isDirectory];

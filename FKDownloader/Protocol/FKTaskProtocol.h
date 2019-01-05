@@ -13,9 +13,9 @@
  核心: 任务即文件, 文件即任务, 文件不保存状态
  - dir(task.identifier)
  |- task.identifier.dti         // 任务信息
- |- task.{idx}.tmp              // 下载缓存, 可能为多个
- |- task.identifier.{idx}.trd   // 恢复信息, 可能为多个
- |- task.identifier.file[s]     // 完成文件, k可能为多个
+ |- task.identifier.{idx}.dtt   // 下载缓存, 可能为多个
+ |- task.identifier.{idx}.dtr   // 恢复信息, 可能为多个
+ |- task.identifier.dtf         // 完成文件, 可能为多个
  */
 
 NS_ASSUME_NONNULL_BEGIN
@@ -28,16 +28,17 @@ NS_ASSUME_NONNULL_BEGIN
 - (id<FKTaskProtocol>)success:(void(^)(id<FKTaskProtocol> task))success;
 - (id<FKTaskProtocol>)faild:(void(^)(id<FKTaskProtocol> task))faild;
 
+@required
+@property (nonatomic, strong) NSString *identifier;
+@property (nonatomic, assign) uint64_t length;
+@property (nonatomic, assign) uint64_t number;
+@property (nonatomic, assign) FKTaskType type;
+@property (nonatomic, assign) FKTaskStatus status;
+
 - (id<FKTaskProtocol>)start;
 - (id<FKTaskProtocol>)suspend;
 - (id<FKTaskProtocol>)resume;
 - (id<FKTaskProtocol>)cancel;
-
-@required
-@property(nonatomic, strong) NSString *identifier;
-@property(nonatomic, strong) NSString *link;
-@property(nonatomic, assign) uint64_t number;
-@property(nonatomic, assign) FKTaskType type;
 
 @end
 

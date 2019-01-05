@@ -32,6 +32,7 @@ typedef struct FKSingleTaskInfo {
     FKTaskBaseInfo base;
     char link[4096];
     char tmp[64];
+    char ext[8];
 } FKSingleTaskInfo;
 
 typedef struct FKGroupTaskInfo {

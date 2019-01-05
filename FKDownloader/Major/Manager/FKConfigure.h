@@ -71,6 +71,11 @@ NS_SWIFT_NAME(Configure)
 @property (nonatomic, assign) NSInteger maximumExecutionTask;
 
 /**
+ FKDownloader 根目录. 默认为 Library/Caches/com.fk.downloader/
+ */
+@property (nonatomic, strong) NSString *rootPath;
+
+/**
  文件保存路径. 默认为 Library/Caches/com.fk.downloader/file/
  */
 @property (nonatomic, strong) NSString *savePath;

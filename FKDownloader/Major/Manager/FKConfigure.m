@@ -25,6 +25,7 @@
     config.sessionIdentifier    = @"com.fk.downloader";
     config.maximumExecutionTask = 3;
     config.speedRefreshInterval = 1;
+    config.rootPath     = [cachePath stringByAppendingPathComponent:@"com.fk.downloader"];
     config.savePath     = [cachePath stringByAppendingPathComponent:@"com.fk.downloader/file"];
     config.resumeSavePath   = [cachePath stringByAppendingPathComponent:@"com.fk.downloader/resume"];
     config.restoreFilePath  = [cachePath stringByAppendingPathComponent:@"com.fk.downloader/downloader.restore"];

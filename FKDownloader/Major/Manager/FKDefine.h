@@ -107,6 +107,16 @@ typedef NS_ENUM(NSInteger, TaskStatus) {
     TaskStatusUnknowError   // 未知错误
 };
 
+typedef NS_ENUM(NSInteger, FKTaskStatus) {
+    FKTaskStatusNone,
+    FKTaskStatusIdle,
+    FKTaskStatusExecuting,
+    FKTaskStatusSuspend,
+    FKTaskStatusMerging,
+    FKTaskStatusComplete,
+    FKTaskStatusFaild
+};
+
 typedef NS_ENUM(NSInteger, VerifyType) {
     VerifyTypeMD5 = 0,
     VerifyTypeSHA1,
