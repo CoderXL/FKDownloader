@@ -13,11 +13,11 @@ typedef struct FKTaskBaseInfo {
     uint64_t number;
     char identifier[65];
     long type;
+    uint64_t length;
 } FKTaskBaseInfo;
 
 typedef struct FKGroupTaskComponent {
     char link[4096];
-    uint64_t length;
     char tmp[64];
 } FKGroupTaskComponent;
 
@@ -30,7 +30,6 @@ typedef struct FKDripTaskComponent {
 
 typedef struct FKSingleTaskInfo {
     FKTaskBaseInfo base;
-    uint64_t length;
     char link[4096];
     char tmp[64];
 } FKSingleTaskInfo;
