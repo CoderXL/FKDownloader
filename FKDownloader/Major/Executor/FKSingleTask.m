@@ -12,13 +12,15 @@
 #import "FKResumeHelper.h"
 #import "NSString+FKDownload.h"
 
-typedef void(^finish)(uint64_t length, int idx);
-void pollingLength(NSArray *links, finish f) {
+typedef void(^poll)(uint64_t length, int idx);
+void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
+    __block int count = 0;
     for (int i = 0; i < links.count; i++) {
         NSString *link = [links objectAtIndex:i];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:link]];
         request.HTTPMethod = @"HEAD";
-        [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+        [[session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
             
             NSNumber *length = @(0);
             if ([response respondsToSelector:@selector(allHeaderFields)]) {
@@ -26,30 +28,20 @@ void pollingLength(NSArray *links, finish f) {
                 NSDictionary *header = res.allHeaderFields;
                 NSNumber *temp = [[NSNumberFormatter new] numberFromString:[header valueForKey:@"Content-Length"]];
                 if (temp) { length = temp; }
+                @synchronized (links) {
+                    count++;
+                    if (count == i) {
+                        if (finish) {
+                            finish();
+                        }
+                    }
+                }
             }
-            if (f) {
-                f(length.unsignedLongLongValue, i);
+            if (p) {
+                p(length.unsignedLongLongValue, i);
             }
         }] resume];
     }
-}
-
-void getLength(NSString *link, finish f) {
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:link]];
-    request.HTTPMethod = @"HEAD";
-    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        
-        NSNumber *length = @(0);
-        if ([response respondsToSelector:@selector(allHeaderFields)]) {
-            NSHTTPURLResponse *res = (NSHTTPURLResponse *)response;
-            NSDictionary *header = res.allHeaderFields;
-            NSNumber *temp = [[NSNumberFormatter new] numberFromString:[header valueForKey:@"Content-Length"]];
-            if (temp) { length = temp; }
-        }
-        if (f) {
-            f(length.unsignedLongLongValue, 0);
-        }
-    }] resume];
 }
 
 @interface FKSingleTask ()
@@ -91,7 +83,11 @@ void getLength(NSString *link, finish f) {
 
 - (void)suspend {
     [self.downloadTask cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
-        
+        if (resumeData) {
+            self.resumeData = resumeData;
+            [self.downloadTask removeObserver:self forKeyPath:NSStringFromSelector(@selector(countOfBytesReceived)) context:nil];
+            [self.downloadTask removeObserver:self forKeyPath:NSStringFromSelector(@selector(countOfBytesExpectedToReceive)) context:nil];
+        }
     }];
     if (self.status) {
         self.status();
@@ -163,7 +159,14 @@ void getLength(NSString *link, finish f) {
 #pragma mark - Getter/setter
 - (void)setLink:(NSString *)link {
     _link = link;
+    
     self.identifier = [link SHA256];
+    NSString *rootPath = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).lastObject;
+    NSString *taskDir = [rootPath stringByAppendingPathComponent:self.identifier];
+    if ([self.manager.fileManager fileExistsAtPath:taskDir] == NO) {
+        [self.manager.fileManager createDirectoryAtPath:taskDir withIntermediateDirectories:YES attributes:nil error:nil];
+        self.taskDir = taskDir;
+    }
 }
 
 - (NSProgress *)taskProgress {

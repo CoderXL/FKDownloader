@@ -23,6 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) uint64_t length;
 @property (nonatomic, strong) NSString *tmp;
 @property (nonatomic, strong) NSData *resumeData;
+@property (nonatomic, strong) NSString *taskDir;
 
 @property (nonatomic, copy  ) FKStatusBlock status;
 @property (nonatomic, copy  ) FKProgressBlock progress;
