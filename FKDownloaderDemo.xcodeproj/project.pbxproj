@@ -74,6 +74,9 @@
 		3DDE858D21E0CD93007EF91C /* NSURLSessionDownloadTask+FKDownload.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DDE858B21E0CD93007EF91C /* NSURLSessionDownloadTask+FKDownload.h */; };
 		3DDE858E21E0CD93007EF91C /* NSURLSessionDownloadTask+FKDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DDE858C21E0CD93007EF91C /* NSURLSessionDownloadTask+FKDownload.m */; };
 		3DDE858F21E0CD93007EF91C /* NSURLSessionDownloadTask+FKDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DDE858C21E0CD93007EF91C /* NSURLSessionDownloadTask+FKDownload.m */; };
+		3DDE859421E1AE04007EF91C /* FKTaskHub.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DDE859221E1AE04007EF91C /* FKTaskHub.h */; };
+		3DDE859521E1AE04007EF91C /* FKTaskHub.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DDE859321E1AE04007EF91C /* FKTaskHub.m */; };
+		3DDE859621E1AE04007EF91C /* FKTaskHub.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DDE859321E1AE04007EF91C /* FKTaskHub.m */; };
 		3DF3534221DC5E09000D57F8 /* FKTaskProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DF3534121DC5E09000D57F8 /* FKTaskProtocol.h */; };
 		642481A06E5DA04399718DF8 /* FKHubProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 64248AC7FAC8B469C91769E6 /* FKHubProtocol.h */; };
 /* End PBXBuildFile section */
@@ -137,6 +140,8 @@
 		3DD308F7218C4E8D00BDF330 /* NSString+FKDownload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+FKDownload.m"; sourceTree = "<group>"; };
 		3DDE858B21E0CD93007EF91C /* NSURLSessionDownloadTask+FKDownload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSURLSessionDownloadTask+FKDownload.h"; sourceTree = "<group>"; };
 		3DDE858C21E0CD93007EF91C /* NSURLSessionDownloadTask+FKDownload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSURLSessionDownloadTask+FKDownload.m"; sourceTree = "<group>"; };
+		3DDE859221E1AE04007EF91C /* FKTaskHub.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FKTaskHub.h; sourceTree = "<group>"; };
+		3DDE859321E1AE04007EF91C /* FKTaskHub.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FKTaskHub.m; sourceTree = "<group>"; };
 		3DF3534121DC5E09000D57F8 /* FKTaskProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FKTaskProtocol.h; sourceTree = "<group>"; };
 		64248AC7FAC8B469C91769E6 /* FKHubProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FKHubProtocol.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -181,6 +186,8 @@
 				3DD308D2218C403C00BDF330 /* FKDownloadExecutor.m */,
 				3DC078A021A95E0A0066CB2C /* FKReachability.h */,
 				3DC078A121A95E0A0066CB2C /* FKReachability.m */,
+				3DDE859221E1AE04007EF91C /* FKTaskHub.h */,
+				3DDE859321E1AE04007EF91C /* FKTaskHub.m */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -340,6 +347,7 @@
 				3D0C622D21996B560041BA82 /* NSString+FKDownload.h in Headers */,
 				3DF3534221DC5E09000D57F8 /* FKTaskProtocol.h in Headers */,
 				3D0C622E21996B560041BA82 /* NSArray+FKDownload.h in Headers */,
+				3DDE859421E1AE04007EF91C /* FKTaskHub.h in Headers */,
 				3D0C622521996AF60041BA82 /* FKDownloader.h in Headers */,
 				3D24736521DEFB6300AEBA7D /* FKGroupTask.h in Headers */,
 				642481A06E5DA04399718DF8 /* FKHubProtocol.h in Headers */,
@@ -465,6 +473,7 @@
 				3D9C1C5521B9055000A607B8 /* FKMapHub.m in Sources */,
 				3D0C623421996B630041BA82 /* NSArray+FKDownload.m in Sources */,
 				3D24732021DD8D1F00AEBA7D /* FKSingleTask.m in Sources */,
+				3DDE859621E1AE04007EF91C /* FKTaskHub.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -489,6 +498,7 @@
 				3DD308F8218C4E8D00BDF330 /* NSString+FKDownload.m in Sources */,
 				3DD308D3218C403C00BDF330 /* FKDownloadExecutor.m in Sources */,
 				3D71563D2196B81B008F91A7 /* TaskViewCell.m in Sources */,
+				3DDE859521E1AE04007EF91C /* FKTaskHub.m in Sources */,
 				3DD308B0218BEDBA00BDF330 /* AppDelegate.m in Sources */,
 				3DC078A321A95E0A0066CB2C /* FKReachability.m in Sources */,
 				3D8CA7A421A5027F00E4BBEA /* FKSystemHelper.m in Sources */,

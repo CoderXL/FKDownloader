@@ -13,7 +13,6 @@
 @interface ViewController ()
 
 @property (nonatomic, strong) UIButton *button;
-@property (nonatomic, strong) FKSingleTask *task;
 
 @end
 
@@ -31,13 +30,18 @@
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    self.task = [[[[[[FKSingleTask taskWithLink:@"http://m4.pc6.com/cjh3/deliver259.dmg"] status:^(FKSingleTask * _Nonnull task) {
+    NSString *link = @"http://m4.pc6.com/cjh3/deliver259.dmg";
+    [[[[[[[FKDownloadManager manager] addTask:[FKSingleTask taskWithLink:link]] status:^(id<FKTaskProtocol>  _Nonnull task) {
+        
         NSLog(@"状态改变");
-    }] progress:^(FKSingleTask * _Nonnull task) {
+    }] progress:^(id<FKTaskProtocol>  _Nonnull task) {
+        
         NSLog(@"进度改变");
-    }] success:^(FKSingleTask * _Nonnull task) {
+    }] success:^(id<FKTaskProtocol>  _Nonnull task) {
+        
         NSLog(@"完成");
-    }] faild:^(FKSingleTask * _Nonnull task) {
+    }] faild:^(id<FKTaskProtocol>  _Nonnull task) {
+        
         NSLog(@"失败");
     }] start];
 }
