@@ -25,6 +25,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSData *resumeData;
 @property (nonatomic, strong) NSString *ext;
 
+@property (nonatomic, copy  ) NSDictionary *userHeader;
+@property (nonatomic, strong) NSError *error;
+
 - (instancetype)initWithLink:(NSString *)link;
 + (instancetype)taskWithLink:(NSString *)link;
 

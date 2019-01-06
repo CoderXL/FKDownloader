@@ -103,31 +103,36 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
         self.tmp = [NSString stringWithUTF8String:info.tmp];
         self.ext = [NSString stringWithUTF8String:info.ext];
         
-        NSString *tmpPath = [taskDir stringByAppendingPathComponent:self.tmp];
-        if ([self.manager.fileManager fileExistsAtPath:tmpPath]) {
-            NSString *resumeDataPath = [taskDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", self.identifier, @"dtr"]];
-            if ([self.manager.fileManager fileExistsAtPath:resumeDataPath]) {
-                NSString *sysTmpPath = [NSTemporaryDirectory() stringByAppendingPathComponent:self.tmp];
-                [self.manager.fileManager moveItemAtPath:tmpPath toPath:sysTmpPath error:nil];
-                
-                self.resumeData = [NSData dataWithContentsOfFile:resumeDataPath options:NSDataReadingMappedIfSafe error:nil];
-                self.status = FKTaskStatusSuspend;
-            } else {
-                self.status = FKTaskStatusNone;
-                [self.manager.fileManager removeItemAtPath:tmpPath error:nil];
-            }
-        } else {
-            NSString *filePath = [taskDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", self.identifier, self.ext]];
-            if ([self.manager.fileManager fileExistsAtPath:filePath]) {
-                self.status = FKTaskStatusComplete;
-            } else {
-                self.status = FKTaskStatusNone;
-                [self.manager.fileManager removeItemAtPath:tmpPath error:nil];
-            }
-        }
+        [self restoryFile];
         return YES;
     }
     return NO;
+}
+
+- (void)restoryFile {
+    NSString *taskDir = [[FKDownloadManager manager].configure.rootPath stringByAppendingPathComponent:self.identifier];
+    NSString *tmpPath = [taskDir stringByAppendingPathComponent:self.tmp];
+    if ([self.manager.fileManager fileExistsAtPath:tmpPath]) {
+        NSString *resumeDataPath = [taskDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dtr", self.identifier]];
+        if ([self.manager.fileManager fileExistsAtPath:resumeDataPath]) {
+            NSString *sysTmpPath = [NSTemporaryDirectory() stringByAppendingPathComponent:self.tmp];
+            [self.manager.fileManager moveItemAtPath:tmpPath toPath:sysTmpPath error:nil];
+            
+            self.resumeData = [NSData dataWithContentsOfFile:resumeDataPath options:NSDataReadingMappedIfSafe error:nil];
+            self.status = FKTaskStatusSuspend;
+        } else {
+            self.status = FKTaskStatusNone;
+            [self.manager.fileManager removeItemAtPath:tmpPath error:nil];
+        }
+    } else {
+        NSString *filePath = [taskDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", self.identifier, self.ext]];
+        if ([self.manager.fileManager fileExistsAtPath:filePath]) {
+            self.status = FKTaskStatusComplete;
+        } else {
+            self.status = FKTaskStatusNone;
+            [self.manager.fileManager removeItemAtPath:tmpPath error:nil];
+        }
+    }
 }
 
 - (FKSingleTask *)start {
@@ -143,12 +148,20 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
         return self;
     }
     
+    [self restoryFile];
     if (self.resumeData) {
         [self resume];
     } else {
-        self.downloadTask = [self.manager.session downloadTaskWithURL:[NSURL URLWithString:self.link]];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:self.link]];
+        if (self.userHeader) {
+            [self.userHeader enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+                [request setValue:obj forHTTPHeaderField:key];
+            }];
+        }
+        self.downloadTask = [self.manager.session downloadTaskWithRequest:request];
         [self.downloadTask resume];
         [self addProgressObserver];
+        self.status = FKTaskStatusExecuting;
         for (void(^block)(FKSingleTask *) in self.statusBlocks) {
             block(self);
         }
@@ -163,6 +176,7 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
             [self removeProgressObserver];
         }
     }];
+    self.status = FKTaskStatusSuspend;
     for (void(^block)(FKSingleTask *) in self.statusBlocks) {
         block(self);
     }
@@ -170,9 +184,11 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
 }
 
 - (FKSingleTask *)resume {
+    [self restoryFile];
     self.downloadTask = [self.manager.session downloadTaskWithResumeData:self.resumeData];
     [self.downloadTask resume];
     [self addProgressObserver];
+    self.status = FKTaskStatusExecuting;
     for (void(^block)(FKSingleTask *) in self.statusBlocks) {
         block(self);
     }
@@ -181,6 +197,7 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
 
 - (FKSingleTask *)cancel {
     [self.downloadTask cancel];
+    self.status = FKTaskStatusNone;
     for (void(^block)(FKSingleTask *) in self.statusBlocks) {
         block(self);
     }
@@ -188,12 +205,15 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
 }
 
 - (void)sendSuccess {
+    self.status = FKTaskStatusComplete;
     for (void(^block)(FKSingleTask *) in self.successBlocks) {
         block(self);
     }
 }
 
 - (void)sendFaild:(NSError *)error {
+    self.status = FKTaskStatusFaild;
+    self.error = error;
     for (void(^block)(FKSingleTask *) in self.faildBlocks) {
         block(self);
     }
@@ -211,7 +231,7 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
 }
 
 - (void)clear {
-    
+    [self removeProgressObserver];
 }
 
 #pragma mark - Observer
@@ -272,7 +292,7 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
 }
 
 
-#pragma mark - Overrive
+#pragma mark - Override
 - (NSUInteger)hash {
     return self.identifier.hash;
 }
