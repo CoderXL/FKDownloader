@@ -22,12 +22,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol FKTaskProtocol <NSObject>
 
-@optional
-- (id<FKTaskProtocol>)status:(void(^)(id<FKTaskProtocol> task))status;
-- (id<FKTaskProtocol>)progress:(void(^)(id<FKTaskProtocol> task))progress;
-- (id<FKTaskProtocol>)success:(void(^)(id<FKTaskProtocol> task))success;
-- (id<FKTaskProtocol>)faild:(void(^)(id<FKTaskProtocol> task))faild;
-
 @required
 @property (nonatomic, strong) NSString *identifier;
 @property (nonatomic, assign) uint64_t length;
@@ -39,6 +33,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (id<FKTaskProtocol>)suspend;
 - (id<FKTaskProtocol>)resume;
 - (id<FKTaskProtocol>)cancel;
+
+- (id<FKTaskProtocol>)status:(void(^)(id<FKTaskProtocol> task))status;
+- (id<FKTaskProtocol>)progress:(void(^)(id<FKTaskProtocol> task))progress;
+- (id<FKTaskProtocol>)success:(void(^)(id<FKTaskProtocol> task))success;
+- (id<FKTaskProtocol>)faild:(void(^)(id<FKTaskProtocol> task))faild;
 
 @end
 

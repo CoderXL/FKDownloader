@@ -15,6 +15,7 @@
 #import "FKHashHelper.h"
 #import "FKResumeHelper.h"
 #import "FKMapHub.h"
+#import "FKTaskHub.h"
 #import "NSString+FKDownload.h"
 #import "NSArray+FKDownload.h"
 #import "NSData+FKDownload.h"

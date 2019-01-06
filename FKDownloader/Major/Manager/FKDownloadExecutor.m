@@ -10,6 +10,7 @@
 #import "FKDownloadManager.h"
 #import "FKConfigure.h"
 #import "FKTask.h"
+#import "FKSingleTask.h"
 #import "FKResumeHelper.h"
 #import "NSString+FKDownload.h"
 
@@ -24,6 +25,36 @@
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
+    NSString *link = task.originalRequest.URL.absoluteString;
+    id<FKTaskProtocol> dt = [[FKDownloadManager manager] acquireTaskWithIdentifier:link.SHA256];
+    if (dt) {
+        if (error) {
+            if (error.code == NSURLErrorCancelled) {
+                NSData *resumeData = [error.userInfo objectForKey:NSURLSessionDownloadTaskResumeData];
+                if (resumeData) {
+                    // 暂停
+                    NSString *resumeDataPath = [[dt.identifier taskDirectoryPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dtr", dt.identifier]];
+                    [resumeData writeToFile:resumeDataPath atomically:YES];
+                    
+                    NSString *dttPath = [[dt.identifier taskDirectoryPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dtt", dt.identifier]];
+                    NSString *sysTmpPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.tmp", [(FKSingleTask *)dt tmp]]];
+                    [[NSFileManager defaultManager] moveItemAtPath:dttPath toPath:sysTmpPath error:nil];
+                } else {
+                    // 取消
+                }
+            } else {
+                // 错误
+            }
+        } else {
+            // 完成
+            [(FKSingleTask *)dt sendSuccess];
+        }
+    } else {
+        // 任务不存在
+        NSString *identifier = link.SHA256;
+        // 保存必要文件以备用
+    }
+    
     /*
     if (task.currentRequest.URL.absoluteString.length == 0) {
         return;
@@ -79,6 +110,15 @@
 
 #pragma mark - NSURLSessionDownloadDelegate
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
+    
+    NSString *link = downloadTask.originalRequest.URL.absoluteString;
+    id<FKTaskProtocol> dt = [[FKDownloadManager manager] acquireTaskWithIdentifier:link.SHA256];
+    if (dt) {
+        NSString *filePath = [[dt.identifier taskDirectoryPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", dt.identifier, [[downloadTask.response suggestedFilename] componentsSeparatedByString:@"."].lastObject]];
+        [[NSFileManager defaultManager] moveItemAtPath:location.path toPath:filePath error:nil];
+    } else {
+        
+    }
     
     /*
     [[FKDownloadManager manager] setupPath];

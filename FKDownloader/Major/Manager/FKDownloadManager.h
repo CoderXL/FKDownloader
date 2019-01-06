@@ -8,9 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "FKDefine.h"
+#import "FKTaskProtocol.h"
 @class FKConfigure;
 @class FKTask;
-@class FKMapHub;
 @class FKReachability;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -33,12 +33,6 @@ NS_SWIFT_NAME(Downloader)
  文件管理
  */
 @property (nonatomic, strong, readonly) NSFileManager *fileManager;
-
-/**
- 保存 Task/Tag 相关的集合, 可以更快的更方便的添加与查找 Task/Tag 信息
- 可使用 -[FKMapHub allTask] 获取所有任务
- */
-@property (nonatomic, strong, readonly) FKMapHub *taskHub;
 
 /**
  总任务进度
@@ -173,6 +167,10 @@ NS_SWIFT_NAME(Downloader)
  开始下一个等待中的任务
  */
 - (void)startNextIdleTask;
+
+#pragma mark - Operation New
+- (nullable id<FKTaskProtocol>)acquireTaskWithIdentifier:(NSString *)identifier;
+- (id<FKTaskProtocol>)addTask:(id<FKTaskProtocol>)task;
 
 
 #pragma mark - Restore

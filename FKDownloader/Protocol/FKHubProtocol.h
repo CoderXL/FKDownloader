@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addObj:(id)obj withKey:(NSString *)key;
 - (void)removeObjOfKey:(NSString *)key;
 
-- (NSArray *)allobjs;
+- (NSArray *)allObjs;
 - (BOOL)containObj:(id)obj;
 - (NSUInteger)countOfObjs;
 

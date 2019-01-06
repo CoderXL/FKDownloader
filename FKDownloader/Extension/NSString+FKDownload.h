@@ -22,5 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)encodeEscapedString;
 - (NSString *)decodeEscapedString;
 
+- (NSString *)taskDirectoryPath;
+
 @end
 NS_ASSUME_NONNULL_END

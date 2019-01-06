@@ -16,6 +16,7 @@
 #import "FKTaskStorage.h"
 #import "FKDefine.h"
 #import "FKReachability.h"
+#import "FKTaskHub.h"
 #import "NSString+FKDownload.h"
 #import "NSArray+FKDownload.h"
 
@@ -27,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) FKDownloadExecutor    *executor;
 @property (nonatomic, strong) NSProgress            *progress;
 @property (nonatomic, strong) FKMapHub              *taskHub;
+@property (nonatomic, strong) FKTaskHub             *sharedTaskHub;
 @property (nonatomic, strong) dispatch_queue_t      timerQueue;
 @property (nonatomic, strong) FKReachability        *reachability;
 @property (nonatomic, assign) BOOL                  isDidEnterBackground;
@@ -674,6 +676,16 @@ static FKDownloadManager *_instance = nil;
      */
 }
 
+#pragma mark - Operation New
+- (id<FKTaskProtocol>)acquireTaskWithIdentifier:(NSString *)identifier {
+    return [self.sharedTaskHub objWithKey:identifier];
+}
+
+- (id<FKTaskProtocol>)addTask:(id<FKTaskProtocol>)task {
+    [self.sharedTaskHub addObj:task withKey:task.identifier];
+    return [self.sharedTaskHub objWithKey:task.identifier];
+}
+
 
 #pragma mark - Restore
 - (void)restory {
@@ -876,6 +888,10 @@ static FKDownloadManager *_instance = nil;
         _taskHub = [[FKMapHub alloc] init];
     }
     return _taskHub;
+}
+
+- (FKTaskHub *)sharedTaskHub {
+    return [FKTaskHub hub];
 }
 
 - (NSProgress *)progress {

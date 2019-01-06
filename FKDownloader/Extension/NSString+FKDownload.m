@@ -7,6 +7,8 @@
 //
 
 #import "NSString+FKDownload.h"
+#import "FKDownloadManager.h"
+#import "FKConfigure.h"
 #import "NSArray+FKDownload.h"
 #import <CommonCrypto/CommonDigest.h>
 
@@ -179,6 +181,10 @@ NSString * AFPercentEscapedStringFromString(NSString *string) {
     }
     
     return escaped;
+}
+
+- (NSString *)taskDirectoryPath {
+    return [[FKDownloadManager manager].configure.rootPath stringByAppendingPathComponent:self];
 }
 
 @end

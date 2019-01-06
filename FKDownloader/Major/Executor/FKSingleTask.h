@@ -35,6 +35,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (FKSingleTask *)success:(void(^)(FKSingleTask *task))success;
 - (FKSingleTask *)faild:(void(^)(FKSingleTask *task))faild;
 
+- (void)sendSuccess;
+- (void)sendFaild:(NSError *)error;
+
 - (FKSingleTask *)start;
 - (FKSingleTask *)suspend;
 - (FKSingleTask *)resume;

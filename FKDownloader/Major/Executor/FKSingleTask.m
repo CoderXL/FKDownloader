@@ -105,28 +105,24 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
         
         NSString *tmpPath = [taskDir stringByAppendingPathComponent:self.tmp];
         if ([self.manager.fileManager fileExistsAtPath:tmpPath]) {
-            NSDictionary *attribute = [self.manager.fileManager attributesOfItemAtPath:tmpPath error:nil];
-            if ([attribute[NSFileSize] longValue] < self.length) {
-                NSString *resumeDataPath = [taskDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", self.identifier, @"dtr"]];
-                if ([self.manager.fileManager fileExistsAtPath:resumeDataPath]) {
-                    NSString *sysTmpPath = [NSTemporaryDirectory() stringByAppendingPathComponent:self.tmp];
-                    [self.manager.fileManager moveItemAtPath:tmpPath toPath:sysTmpPath error:nil];
-                    
-                    self.resumeData = [NSData dataWithContentsOfFile:resumeDataPath options:NSDataReadingMappedIfSafe error:nil];
-                    self.status = FKTaskStatusSuspend;
-                } else {
-                    self.status = FKTaskStatusNone;
-                    [self.manager.fileManager removeItemAtPath:tmpPath error:nil];
-                    [self.manager.fileManager removeItemAtPath:resumeDataPath error:nil];
-                }
+            NSString *resumeDataPath = [taskDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", self.identifier, @"dtr"]];
+            if ([self.manager.fileManager fileExistsAtPath:resumeDataPath]) {
+                NSString *sysTmpPath = [NSTemporaryDirectory() stringByAppendingPathComponent:self.tmp];
+                [self.manager.fileManager moveItemAtPath:tmpPath toPath:sysTmpPath error:nil];
+                
+                self.resumeData = [NSData dataWithContentsOfFile:resumeDataPath options:NSDataReadingMappedIfSafe error:nil];
+                self.status = FKTaskStatusSuspend;
             } else {
-                NSString *filePath = [taskDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", self.identifier, self.ext]];
-                if ([self.manager.fileManager fileExistsAtPath:filePath]) {
-                    self.status = FKTaskStatusComplete;
-                } else {
-                    self.status = FKTaskStatusNone;
-                    [self.manager.fileManager removeItemAtPath:tmpPath error:nil];
-                }
+                self.status = FKTaskStatusNone;
+                [self.manager.fileManager removeItemAtPath:tmpPath error:nil];
+            }
+        } else {
+            NSString *filePath = [taskDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", self.identifier, self.ext]];
+            if ([self.manager.fileManager fileExistsAtPath:filePath]) {
+                self.status = FKTaskStatusComplete;
+            } else {
+                self.status = FKTaskStatusNone;
+                [self.manager.fileManager removeItemAtPath:tmpPath error:nil];
             }
         }
         return YES;
@@ -140,6 +136,13 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
     // 获取 length
     // 真正开始
     // 保存信息
+    if (self.status == FKTaskStatusComplete) {
+        for (void(^block)(FKSingleTask *) in self.successBlocks) {
+            block(self);
+        }
+        return self;
+    }
+    
     if (self.resumeData) {
         [self resume];
     } else {
@@ -182,6 +185,18 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
         block(self);
     }
     return self;
+}
+
+- (void)sendSuccess {
+    for (void(^block)(FKSingleTask *) in self.successBlocks) {
+        block(self);
+    }
+}
+
+- (void)sendFaild:(NSError *)error {
+    for (void(^block)(FKSingleTask *) in self.faildBlocks) {
+        block(self);
+    }
 }
 
 #pragma mark - observer
@@ -257,14 +272,40 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
 }
 
 
+#pragma mark - Overrive
+- (NSUInteger)hash {
+    return self.identifier.hash;
+}
+
+- (BOOL)isEqual:(id)object {
+    if ([object isKindOfClass:[self class]] && [self.identifier isEqualToString:[object identifier]]) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
+
+
 #pragma mark - Getter/setter
 - (void)setIdentifier:(NSString *)identifier {
     _identifier = identifier;
     
-    NSString *rootPath = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).lastObject;
-    NSString *taskDir = [rootPath stringByAppendingPathComponent:self.identifier];
+    NSString *taskDir = [self.manager.configure.rootPath stringByAppendingPathComponent:self.identifier];
     if ([self.manager.fileManager fileExistsAtPath:taskDir] == NO) {
         [self.manager.fileManager createDirectoryAtPath:taskDir withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+}
+
+- (NSData *)resumeData {
+    if (_resumeData) {
+        return _resumeData;
+    } else {
+        NSString *dtrPath = [[self.identifier taskDirectoryPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dtr", self.identifier]];
+        if ([self.manager.fileManager fileExistsAtPath:dtrPath]) {
+            return [NSData dataWithContentsOfFile:dtrPath options:NSDataReadingMappedIfSafe error:nil];
+        } else {
+            return nil;
+        }
     }
 }
 

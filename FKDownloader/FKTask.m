@@ -525,7 +525,7 @@ NS_ASSUME_NONNULL_END
         }
     }
     for (NSString *tag in tags) {
-        [self.manager.taskHub removeTag:tag from:self];
+//        [self.manager.taskHub removeTag:tag from:self];
     }
 }
 
