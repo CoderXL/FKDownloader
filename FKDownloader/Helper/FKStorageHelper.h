@@ -11,38 +11,42 @@
 
 typedef struct FKTaskBaseInfo {
     uint64_t number;
-    char identifier[65];
     long type;
     uint64_t length;
+    char *identifier;
 } FKTaskBaseInfo;
 
 typedef struct FKGroupTaskComponent {
-    char link[4096];
-    char tmp[64];
+    char *link;
+    char *tmp;
 } FKGroupTaskComponent;
 
 typedef struct FKDripTaskComponent {
     uint64_t idx;
     uint16_t start;
     uint16_t end;
-    char tmp[64];
+    char *tmp;
 } FKDripTaskComponent;
 
 typedef struct FKSingleTaskInfo {
     FKTaskBaseInfo base;
-    char link[4096];
-    char tmp[64];
-    char ext[8];
+    char *link;
+    char *tmp;
+    char *ext;
 } FKSingleTaskInfo;
 
 typedef struct FKGroupTaskInfo {
     FKTaskBaseInfo base;
+    uint16_t count;
     FKGroupTaskComponent *components;
 } FKGroupTaskInfo;
 
 typedef struct FKDripTaskInfo {
     FKTaskBaseInfo base;
     FKDripTaskComponent *components;
+    uint16_t count;
+    char *link;
+    char *ext;
 } FKDripTaskInfo;
 
 NS_ASSUME_NONNULL_BEGIN

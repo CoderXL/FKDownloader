@@ -31,15 +31,15 @@
             FKSingleTaskInfo info;
             info.base.number = singleTask.number;
             info.base.type = singleTask.type;
-            strcpy(info.base.identifier, [singleTask.identifier cStringUsingEncoding:NSUTF8StringEncoding]);
-            strcpy(info.link, [singleTask.link cStringUsingEncoding:NSUTF8StringEncoding]);
+            info.base.identifier = strdup([singleTask.identifier cStringUsingEncoding:NSUTF8StringEncoding]);
+            info.link = strdup([singleTask.link cStringUsingEncoding:NSUTF8StringEncoding]);
             info.base.length = singleTask.length;
-            strcpy(info.tmp, [singleTask.tmp cStringUsingEncoding:NSUTF8StringEncoding]);
-            strcpy(info.ext, [singleTask.ext cStringUsingEncoding:NSUTF8StringEncoding]);
+            info.tmp = strdup([singleTask.tmp cStringUsingEncoding:NSUTF8StringEncoding]);
+            info.ext = strdup([singleTask.ext cStringUsingEncoding:NSUTF8StringEncoding]);
             
             NSString *dtiPath = [taskDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dti", singleTask.identifier]];
             FILE *fp = fopen(dtiPath.UTF8String, "wb");
-            fwrite(&info, sizeof(FKSingleTaskInfo), 1, fp);
+            fwrite(&info, sizeof(struct FKSingleTaskInfo), 1, fp);
             fclose(fp);
             
         } break;
