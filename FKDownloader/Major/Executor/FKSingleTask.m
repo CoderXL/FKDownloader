@@ -11,6 +11,7 @@
 #import "FKConfigure.h"
 #import "FKStorageHelper.h"
 #import "FKResumeHelper.h"
+#import "NSURLSessionDownloadTask+FKDownload.h"
 #import "NSString+FKDownload.h"
 
 typedef void(^poll)(uint64_t length, int idx);
@@ -159,6 +160,7 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
             }];
         }
         self.downloadTask = [self.manager.session downloadTaskWithRequest:request];
+        self.downloadTask.fkidentifier = self.identifier;
         [self.downloadTask resume];
         [self addProgressObserver];
         self.status = FKTaskStatusExecuting;

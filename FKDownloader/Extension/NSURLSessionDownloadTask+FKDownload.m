@@ -19,4 +19,12 @@
     objc_setAssociatedObject(self, @selector(fkidentifier), fkidentifier, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+- (NSInteger)idx {
+    return [objc_getAssociatedObject(self, @selector(idx)) integerValue];
+}
+
+- (void)setIdx:(NSInteger)idx {
+    objc_setAssociatedObject(self, @selector(idx), @(idx), OBJC_ASSOCIATION_ASSIGN);
+}
+
 @end

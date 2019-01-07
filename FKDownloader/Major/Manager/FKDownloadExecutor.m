@@ -13,6 +13,7 @@
 #import "FKSingleTask.h"
 #import "FKResumeHelper.h"
 #import "NSString+FKDownload.h"
+#import "NSURLSessionDownloadTask+FKDownload.h"
 
 @implementation FKDownloadExecutor
 
@@ -25,8 +26,32 @@
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
-    NSString *link = task.originalRequest.URL.absoluteString;
-    id<FKTaskProtocol> dt = [[FKDownloadManager manager] acquireTaskWithIdentifier:link.SHA256];
+    if ([task.response isKindOfClass:[NSHTTPURLResponse class]]) {
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)task.response;
+        NSInteger statusCode = httpResponse.statusCode;
+        if (statusCode < 200 || statusCode > 300) {
+            return;
+        }
+    }
+    
+    NSString *identifier = [(NSURLSessionDownloadTask *)task fkidentifier];
+    NSInteger idx = [(NSURLSessionDownloadTask *)task idx];
+    id<FKTaskProtocol> dt = [[FKDownloadManager manager] acquireTaskWithIdentifier:identifier];
+    switch (dt.type) {
+        case FKTaskTypeSingle: {
+            [self singleTask:dt didCompleteWithError:error];
+        } break;
+            
+        case FKTaskTypeGroup: {
+            [self groupTask:dt idx:idx didCompleteWithError:error];
+        } break;
+            
+        case FKTaskTypeDrip: {
+            [self dripTask:dt idx:idx didCompleteWithError:error];
+        } break;
+    }
+    
+    /*
     if (dt) {
         if (error) {
             if (error.code == NSURLErrorCancelled) {
@@ -50,10 +75,9 @@
             [(FKSingleTask *)dt sendSuccess];
         }
     } else {
-        // 任务不存在
-        NSString *identifier = link.SHA256;
-        // 保存必要文件以备用
+        // 任务不存在, 保存必要文件以备用
     }
+     */
     
     /*
     if (task.currentRequest.URL.absoluteString.length == 0) {
@@ -105,6 +129,42 @@
     
     [[FKDownloadManager manager] startNextIdleTask];
      */
+}
+
+- (void)singleTask:(FKSingleTask *)task didCompleteWithError:(NSError *)error {
+    if (task) {
+        if (error) {
+            if (error.code == NSURLErrorCancelled) {
+                NSData *resumeData = [error.userInfo objectForKey:NSURLSessionDownloadTaskResumeData];
+                if (resumeData) {
+                    // 暂停
+                    NSString *resumeDataPath = [[task.identifier taskDirectoryPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dtr", task.identifier]];
+                    [resumeData writeToFile:resumeDataPath atomically:YES];
+                    
+                    NSString *dttPath = [[task.identifier taskDirectoryPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.dtt", task.identifier]];
+                    NSString *sysTmpPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.tmp", [task tmp]]];
+                    [[NSFileManager defaultManager] moveItemAtPath:dttPath toPath:sysTmpPath error:nil];
+                } else {
+                    // 取消
+                }
+            } else {
+                // 错误
+            }
+        } else {
+            // 完成
+            [task sendSuccess];
+        }
+    } else {
+        // 任务不存在, 保存必要文件以备用
+    }
+}
+
+- (void)groupTask:(FKSingleTask *)task idx:(NSInteger)idx didCompleteWithError:(NSError *)error {
+    
+}
+
+- (void)dripTask:(FKSingleTask *)task idx:(NSInteger)idx didCompleteWithError:(NSError *)error {
+    
 }
 
 

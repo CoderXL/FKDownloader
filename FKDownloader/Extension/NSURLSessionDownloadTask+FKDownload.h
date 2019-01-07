@@ -12,7 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSURLSessionDownloadTask (FKDownload)
 
-@property (nonatomic, strong) NSString *fkidentifier;
+@property (nonatomic, strong) NSString *fkidentifier;   // 任务标识
+@property (nonatomic, assign) NSInteger idx;    // 标记 group/drip 子任务编号
 
 @end
 
