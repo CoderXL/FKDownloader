@@ -31,7 +31,8 @@
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     NSString *link = @"http://m4.pc6.com/cjh3/deliver259.dmg";
-    [[[[[[[FKDownloadManager manager] addTask:[FKSingleTask taskWithLink:link]] status:^(id<FKTaskProtocol>  _Nonnull task) {
+    [[FKDownloadManager manager] addTask:[FKSingleTask taskWithLink:link]];
+    [[[[[[[FKDownloadManager manager] acquireTaskWithIdentifier:link.SHA256] status:^(id<FKTaskProtocol>  _Nonnull task) {
         
         NSLog(@"状态改变");
     }] progress:^(id<FKTaskProtocol>  _Nonnull task) {

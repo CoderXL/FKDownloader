@@ -159,6 +159,7 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
                 [request setValue:obj forHTTPHeaderField:key];
             }];
         }
+        [self removeProgressObserver];
         self.downloadTask = [self.manager.session downloadTaskWithRequest:request];
         self.downloadTask.fkidentifier = self.identifier;
         [self.downloadTask resume];
@@ -199,6 +200,8 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
 
 - (FKSingleTask *)cancel {
     [self.downloadTask cancel];
+    [self removeProgressObserver];
+    self.downloadTask = nil;
     self.status = FKTaskStatusNone;
     for (void(^block)(FKSingleTask *) in self.statusBlocks) {
         block(self);
