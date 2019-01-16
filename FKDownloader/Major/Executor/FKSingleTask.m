@@ -11,7 +11,7 @@
 #import "FKConfigure.h"
 #import "FKStorageHelper.h"
 #import "FKResumeHelper.h"
-#import "NSURLSessionDownloadTask+FKDownload.h"
+#import "NSURLSessionTask+FKDownload.h"
 #import "NSString+FKDownload.h"
 
 typedef void(^poll)(uint64_t length, int idx);
@@ -188,6 +188,7 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
 
 - (FKSingleTask *)resume {
     [self restoryFile];
+    [self removeProgressObserver];
     self.downloadTask = [self.manager.session downloadTaskWithResumeData:self.resumeData];
     [self.downloadTask resume];
     [self addProgressObserver];
@@ -231,8 +232,13 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
 }
 
 - (void)removeProgressObserver {
-    [self.downloadTask removeObserver:self forKeyPath:NSStringFromSelector(@selector(countOfBytesReceived)) context:nil];
-    [self.downloadTask removeObserver:self forKeyPath:NSStringFromSelector(@selector(countOfBytesExpectedToReceive)) context:nil];
+    @try {
+        [self.downloadTask removeObserver:self forKeyPath:NSStringFromSelector(@selector(countOfBytesReceived)) context:nil];
+    } @catch (NSException *exception) { }
+    
+    @try {
+        [self.downloadTask removeObserver:self forKeyPath:NSStringFromSelector(@selector(countOfBytesExpectedToReceive)) context:nil];
+    } @catch (NSException *exception) { }
 }
 
 - (void)clear {
@@ -250,8 +256,6 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
                 __strong typeof(weak) strong = weak;
                 if (resumeData) {
                     strong.resumeData = resumeData;
-                    [strong removeProgressObserver];
-                    
                     NSDictionary *resumeDic = [FKResumeHelper readResumeData:resumeData];
                     if ([resumeDic.allKeys containsObject:FKResumeDataInfoTempFileName]) {
                         strong.tmp = [resumeDic objectForKey:FKResumeDataInfoTempFileName];
@@ -261,8 +265,14 @@ void pollingLength(NSArray *links, poll p, dispatch_block_t finish) {
                     }
                     strong.length = strong.downloadTask.countOfBytesExpectedToReceive;
                     strong.ext = [strong.downloadTask.response.suggestedFilename componentsSeparatedByString:@"."].lastObject;
-                    [strong resume];
                     [FKStorageHelper saveTask:strong];
+                    
+                    [strong removeProgressObserver];
+                    strong.downloadTask = [strong.manager.session downloadTaskWithResumeData:self.resumeData];
+                    strong.downloadTask.fkidentifier = strong.identifier;
+                    [strong.downloadTask resume];
+                    [strong addProgressObserver];
+                    strong.status = FKTaskStatusExecuting;
                 }
             }];
         }

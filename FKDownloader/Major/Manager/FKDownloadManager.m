@@ -683,7 +683,7 @@ static FKDownloadManager *_instance = nil;
 
 - (id<FKTaskProtocol>)addTask:(id<FKTaskProtocol>)task {
     [self.sharedTaskHub addObj:task withKey:task.identifier];
-    return [self.sharedTaskHub objWithKey:task.identifier];
+    return task;
 }
 
 

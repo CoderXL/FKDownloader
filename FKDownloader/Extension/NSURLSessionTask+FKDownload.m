@@ -1,15 +1,15 @@
 //
-//  NSURLSessionDownloadTask+FKDownload.m
+//  NSURLSessionTask+FKDownload.m
 //  FKDownloaderDemo
 //
-//  Created by norld on 2019/1/5.
+//  Created by norld on 2019/1/16.
 //  Copyright © 2019 Norld. All rights reserved.
 //
 
-#import "NSURLSessionDownloadTask+FKDownload.h"
+#import "NSURLSessionTask+FKDownload.h"
 #import <objc/runtime.h>
 
-@implementation NSURLSessionDownloadTask (FKDownload)
+@implementation NSURLSessionTask (FKDownload)
 
 - (NSString *)fkidentifier {
     return objc_getAssociatedObject(self, @selector(fkidentifier));

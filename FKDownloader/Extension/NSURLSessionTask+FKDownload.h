@@ -1,8 +1,8 @@
 //
-//  NSURLSessionDownloadTask+FKDownload.h
+//  NSURLSessionTask+FKDownload.h
 //  FKDownloaderDemo
 //
-//  Created by norld on 2019/1/5.
+//  Created by norld on 2019/1/16.
 //  Copyright © 2019 Norld. All rights reserved.
 //
 
@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NSURLSessionDownloadTask (FKDownload)
+@interface NSURLSessionTask (FKDownload)
 
 @property (nonatomic, strong) NSString *fkidentifier;   // 任务标识
 @property (nonatomic, assign) NSInteger idx;    // 标记 group/drip 子任务编号

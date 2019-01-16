@@ -13,7 +13,7 @@
 #import "FKSingleTask.h"
 #import "FKResumeHelper.h"
 #import "NSString+FKDownload.h"
-#import "NSURLSessionDownloadTask+FKDownload.h"
+#import "NSURLSessionTask+FKDownload.h"
 
 @implementation FKDownloadExecutor
 
@@ -34,8 +34,8 @@
         }
     }
     
-    NSString *identifier = [(NSURLSessionDownloadTask *)task fkidentifier];
-    NSInteger idx = [(NSURLSessionDownloadTask *)task idx];
+    NSString *identifier = [task fkidentifier];
+    NSInteger idx = [task idx];
     id<FKTaskProtocol> dt = [[FKDownloadManager manager] acquireTaskWithIdentifier:identifier];
     switch (dt.type) {
         case FKTaskTypeSingle: {
